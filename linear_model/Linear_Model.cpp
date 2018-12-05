@@ -147,7 +147,7 @@ arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lamb
 			// update beta_j
 			hbeta[j] = soft_threshold(z, lambda);
 			// update r
-			r = y - (hbeta[j] - hbeta_old[j])*X.col(j);
+			r = r - (hbeta[j] - hbeta_old[j])*X.col(j);
 		}
 		NUM_ITERATION = i + 1;
 		if (arma::norm(hbeta - hbeta_old) < eps)
