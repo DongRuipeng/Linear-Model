@@ -25,7 +25,7 @@ Linear_Model::Linear_Model(arma::mat X, arma::vec y)
 Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda)
 {
 	Linear_Model::hbeta = coordinate_descent(X, y, lambda);
-	Linear_Model::hbeta_path = lars_path(X, y);
+	Linear_Model::hbeta_path = lars_path(X, y, lambda);
 }
 
 Linear_Model::~Linear_Model()
@@ -33,7 +33,7 @@ Linear_Model::~Linear_Model()
 	std::cout << "delete the objetion ... \n";
 }
 
-arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y)
+arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 {
 	unsigned r_x = arma::rank(X);
 	// intilize hmu
@@ -89,6 +89,10 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y)
 
 		// update max_c
 		max_c = max_c - gama[i] * A_a;
+		if (max_c <= lambda)
+		{
+			break;
+		}
 		// update the active set and the complement
 		arma::uvec new_x_set = arma::find(temp_gama == gama[i]);
 		active_set.insert_rows(0, active_set_c.elem(new_x_set));
@@ -201,5 +205,16 @@ void Linear_Model::estimator_print()
 		std::cout << Linear_Model::hbeta << std::endl;
 		std::cout << "the path of least angle regression is : \n";
 		std::cout << Linear_Model::hbeta_path;
+	}
+}
+
+void Linear_Model::estimator_error(arma::vec beta)
+{
+	if (!Linear_Model::hbeta_path.is_empty())
+	{
+		std::cout << "the estimate error of the coordinate descend algorithm : \n";
+		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta - beta) << "\n";
+		/*std::cout << "the estimate error of the least angle regression : \n";
+		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta_path)*/
 	}
 }
