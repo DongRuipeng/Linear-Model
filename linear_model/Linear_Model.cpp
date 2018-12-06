@@ -39,11 +39,11 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 	// intilize hmu
 	arma::vec hmu = arma::zeros(y.n_elem);
 	// initilize the output: gamma
-	arma::vec gama = arma::zeros(r_x);
+	// arma::vec gama = arma::zeros(r_x);
 	// initilize the correlation between X and y
 	arma::vec hc = X.t() * y;
 	// initilize the maximum correlation
-	arma::vec max_c = arma::zeros(r_x);
+	arma::vec max_c = arma::zeros(r_x + 1);
 	max_c[0] = arma::max(arma::abs(hc));
 	// initilize the active set 
 	arma::uvec active_set = arma::find(abs(hc) == max_c[0]);
@@ -56,6 +56,7 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 
 	for (unsigned i = 0; i < r_x; i++)
 	{
+		double gama;
 		col_num_hbeta = i;
 		// get the sign of the correlation in the active set
 		arma::vec s = get_sign(hc(active_set));
@@ -85,23 +86,23 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 		{
 			temp_gama[j] = std::min(temp_gama_1[j], temp_gama_2[j]);
 		}
-		gama[i] = temp_gama.min();
+		gama = temp_gama.min();
 		arma::vec d = arma::diagmat(s) * A_a * G_a_inv * one_vec;
 		arma::vec temp_d = -hbeta.submat(active_set, arma::uvec{ i }) / d;
 		temp_d(arma::find(temp_d <= 0)).fill(INFINITY);
-		if (gama[i] > temp_d.min())
+		if (gama > temp_d.min())
 		{
-			gama[i] = temp_d.min();
+			gama = temp_d.min();
 			// update hbeta
-			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * d;
+			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama * d;
 			// update max_c
-			max_c[i + 1] = max_c[i] - gama[i] * A_a;
+			max_c[i + 1] = max_c[i] - gama * A_a;
 			if (max_c[i + 1] <= lambda)
 			{
 				break;
 			}
 			// update hc and hmu
-			hmu = hmu + gama[i] * u_a;
+			hmu = hmu + gama * u_a;
 			hc = X.t() * (y - hmu);
 			// update the active set and the complement
 			arma::uvec index = arma::find(temp_d == temp_d.min());
@@ -113,27 +114,29 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 			continue;
 		}
 		// update hbeta
-		hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] *  d;
+		hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama *  d;
 
 		// update max_c
-		max_c[i + 1] = max_c[i] - gama[i] * A_a;
+		max_c[i + 1] = max_c[i] - gama * A_a;
 		if (max_c[i + 1] <= lambda)
 		{
 			break;
 		}
 		// update the active set and the complement
-		arma::uvec new_x_set = arma::find(temp_gama == gama[i]);
+		arma::uvec new_x_set = arma::find(temp_gama == gama);
 		active_set.insert_rows(0, active_set_c.elem(new_x_set));
 		for (unsigned k = 0; k < new_x_set.n_elem; k++)
 		{
 			active_set_c.shed_row(new_x_set[k]);
 		}
 		// update hc and hmu
-		hmu = hmu + gama[i] * u_a;
+		hmu = hmu + gama * u_a;
 		hc = X.t() * (y - hmu);
 		if (active_set_c.n_rows == 0)
 		{
+			// std::cout << "complement is null ... \n";
 			i = i + 1;
+			col_num_hbeta = i;
 			// get the sign of the correlation in the active set
 			arma::vec s = get_sign(hc(active_set));
 			// make the angle between X_a and y less than pi/2
@@ -148,22 +151,36 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 			arma::mat A_a_temp = one_vec.t() * G_a_inv * one_vec;
 			double A_a = A_a_temp[0, 0];
 			A_a = 1 / sqrt(A_a);
-			gama[i] = max_c[i] / A_a;
-			// update max_c
-			max_c[i + 1] = 0;
+			gama = max_c[i] / A_a;
 			// update hbeta
-			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * A_a * arma::diagmat(s) * G_a_inv * one_vec;
+			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama * A_a * arma::diagmat(s) * G_a_inv * one_vec;
+			// update max_c
+			arma::mat temp_max_c = X.t() * ( y - X * hbeta.col(i + 1) );
+			max_c[i + 1] = temp_max_c[0, 0];
+			//std::cout << max_c[i + 1] << std::endl;
+			//std::cout << i + 1 << std::endl;
 			break;
 		}
 		// std::cout << max_c << std::endl;
 	}
 	col_num_hbeta = col_num_hbeta + 1;
-	// std::cout << col_num_hbeta << std::endl;
-	hbeta.shed_col(0);
-	hbeta.shed_cols(col_num_hbeta,hbeta.n_cols - 1);
-	max_c.shed_row(0);
-	max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
-	// std::cout << max_c << std::endl;
+	//std::cout << col_num_hbeta << std::endl;
+	if (active_set_c.is_empty())
+	{
+		hbeta.shed_col(0);
+		max_c.shed_row(0);
+	}
+	else
+	{
+		hbeta.shed_col(0);
+		hbeta.shed_cols(col_num_hbeta, hbeta.n_cols - 1);
+		max_c.shed_row(0);
+		max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
+	}
+	
+	std::cout << max_c << std::endl;
+	std::cout << hbeta << std::endl;
+
 	Linear_Model::Solution_Path path;
 	path.C_path = max_c;
 	path.hbeta_path = hbeta;

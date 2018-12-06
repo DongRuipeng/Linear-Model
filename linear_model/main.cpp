@@ -6,11 +6,9 @@
 
 int main()
 {
-	unsigned n = 100, p = 15;
+	unsigned n = 100, p = 5;
 	arma::mat X = arma::randn<arma::mat>(n, p);
-	arma::vec beta = arma::zeros(p);
-	arma::uvec index = { 0,1,2,3,4,5,6,7,8,9};
-	beta(index) = arma::randn<arma::vec>(index.n_rows);
+	arma::vec beta = arma::randn<arma::vec>(p);
 
 	arma::vec e = 0.1*arma::zeros(n);
 	arma::vec y = X * beta;// +e;
@@ -19,7 +17,7 @@ int main()
 	
 	/*std::cout << "the true coefficient is \n ";
 	std::cout << beta << std::endl;*/
-	Linear_Model model(X, y, 0.05);
+	Linear_Model model(X, y, 30);
 	// model.estimator_print();
 	// model.estimator_error(beta);
 }
