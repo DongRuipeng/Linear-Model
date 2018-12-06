@@ -43,11 +43,12 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 	// initilize the correlation between X and y
 	arma::vec hc = X.t() * y;
 	// initilize the maximum correlation
-	double max_c = arma::max(arma::abs(hc));
+	arma::vec max_c = arma::zeros(r_x);
+	max_c[0] = arma::max(arma::abs(hc));
 	// initilize the active set 
-	arma::uvec active_set = arma::find(abs(hc) == max_c);
+	arma::uvec active_set = arma::find(abs(hc) == max_c[0]);
 	// initilize the complement of the active set
-	arma::uvec active_set_c = arma::find(abs(hc) != max_c);
+	arma::uvec active_set_c = arma::find(abs(hc) != max_c[0]);
 	// initilize hbeta
 	arma::mat hbeta = arma::zeros(X.n_cols, r_x + 1);
 	// define the column number of hbeta;
@@ -75,9 +76,9 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 		// initilize a temp variable
 		arma::vec a = X.t() * u_a;
 		// get the gama(i) in the i^th step
-		arma::vec temp_gama_1 = (max_c - hc(active_set_c)) / (A_a - a(active_set_c));
+		arma::vec temp_gama_1 = (max_c[i] - hc(active_set_c)) / (A_a - a(active_set_c));
 		temp_gama_1(arma::find(temp_gama_1 <= 0)).fill(INFINITY);
-		arma::vec temp_gama_2 = (max_c + hc(active_set_c)) / (A_a + a(active_set_c));
+		arma::vec temp_gama_2 = (max_c[i] + hc(active_set_c)) / (A_a + a(active_set_c));
 		temp_gama_2(arma::find(temp_gama_2 <= 0)).fill(INFINITY);
 		arma::vec temp_gama = arma::zeros(active_set_c.n_rows);
 		for (unsigned j = 0; j < active_set_c.n_rows; j++)
@@ -94,8 +95,8 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 			// update hbeta
 			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * d;
 			// update max_c
-			max_c = max_c - gama[i] * A_a;
-			if (max_c <= lambda)
+			max_c[i + 1] = max_c[i] - gama[i] * A_a;
+			if (max_c[i + 1] <= lambda)
 			{
 				break;
 			}
@@ -115,8 +116,8 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 		hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] *  d;
 
 		// update max_c
-		max_c = max_c - gama[i] * A_a;
-		if (max_c <= lambda)
+		max_c[i + 1] = max_c[i] - gama[i] * A_a;
+		if (max_c[i + 1] <= lambda)
 		{
 			break;
 		}
@@ -147,7 +148,9 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 			arma::mat A_a_temp = one_vec.t() * G_a_inv * one_vec;
 			double A_a = A_a_temp[0, 0];
 			A_a = 1 / sqrt(A_a);
-			gama[i] = max_c / A_a;
+			gama[i] = max_c[i] / A_a;
+			// update max_c
+			max_c[i + 1] = 0;
 			// update hbeta
 			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * A_a * arma::diagmat(s) * G_a_inv * one_vec;
 			break;
@@ -155,9 +158,12 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 		// std::cout << max_c << std::endl;
 	}
 	col_num_hbeta = col_num_hbeta + 1;
-	//std::cout << col_num_hbeta << std::endl;
+	// std::cout << col_num_hbeta << std::endl;
 	hbeta.shed_col(0);
-	//std::cout << hbeta.n_cols << std::endl;
+	hbeta.shed_cols(col_num_hbeta,hbeta.n_cols - 1);
+	max_c.shed_row(0);
+	max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
+	std::cout << max_c << std::endl;
 	return hbeta;
 }
 

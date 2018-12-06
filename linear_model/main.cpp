@@ -15,7 +15,7 @@ int main()
 	arma::vec e = 0.1*arma::zeros(n);
 	arma::vec y = X * beta;// +e;
 
-	
+	std::cout << arma::max(arma::abs(X.t() * y)) << std::endl;
 	
 	/*std::cout << "the true coefficient is \n ";
 	std::cout << beta << std::endl;*/
