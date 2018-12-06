@@ -25,7 +25,7 @@ Linear_Model::Linear_Model(arma::mat X, arma::vec y)
 Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda)
 {
 	Linear_Model::hbeta = coordinate_descent(X, y, lambda);
-	Linear_Model::hbeta_path = lars_path(X, y, lambda);
+	Linear_Model::path = lars_path(X, y, lambda);
 }
 
 Linear_Model::~Linear_Model()
@@ -33,7 +33,7 @@ Linear_Model::~Linear_Model()
 	std::cout << "delete the objetion ... \n";
 }
 
-arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
+Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 {
 	unsigned r_x = arma::rank(X);
 	// intilize hmu
@@ -163,8 +163,11 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 	hbeta.shed_cols(col_num_hbeta,hbeta.n_cols - 1);
 	max_c.shed_row(0);
 	max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
-	std::cout << max_c << std::endl;
-	return hbeta;
+	// std::cout << max_c << std::endl;
+	Linear_Model::Solution_Path path;
+	path.C_path = max_c;
+	path.hbeta_path = hbeta;
+	return path;
 }
 
 arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lambda)
@@ -229,29 +232,29 @@ double Linear_Model::soft_threshold(double z, double lambda)
 	return z;
 }
 
-void Linear_Model::estimator_print()
-{
-	if (Linear_Model::hbeta_path.is_empty())
-	{
-		std::cout << "there is no penalty, the OLS estimator : \n";
-		std::cout << Linear_Model::hbeta << std::endl;
-	}
-	else
-	{
-		std::cout << "there is a penalty, the sparse esitmator : \n";
-		std::cout << Linear_Model::hbeta << std::endl;
-		std::cout << "the path of least angle regression is : \n";
-		std::cout << Linear_Model::hbeta_path;
-	}
-}
-
-void Linear_Model::estimator_error(arma::vec beta)
-{
-	if (!Linear_Model::hbeta_path.is_empty())
-	{
-		std::cout << "the estimate error of the coordinate descend algorithm : \n";
-		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta - beta) << "\n";
-		/*std::cout << "the estimate error of the least angle regression : \n";
-		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta_path)*/
-	}
-}
+//void Linear_Model::estimator_print()
+//{
+//	if (Linear_Model::hbeta_path.is_empty())
+//	{
+//		std::cout << "there is no penalty, the OLS estimator : \n";
+//		std::cout << Linear_Model::hbeta << std::endl;
+//	}
+//	else
+//	{
+//		std::cout << "there is a penalty, the sparse esitmator : \n";
+//		std::cout << Linear_Model::hbeta << std::endl;
+//		std::cout << "the path of least angle regression is : \n";
+//		std::cout << Linear_Model::hbeta_path;
+//	}
+//}
+//
+//void Linear_Model::estimator_error(arma::vec beta)
+//{
+//	if (!Linear_Model::hbeta_path.is_empty())
+//	{
+//		std::cout << "the estimate error of the coordinate descend algorithm : \n";
+//		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta - beta) << "\n";
+//		/*std::cout << "the estimate error of the least angle regression : \n";
+//		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta_path)*/
+//	}
+//}

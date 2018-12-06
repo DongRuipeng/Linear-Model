@@ -20,7 +20,7 @@ int main()
 	/*std::cout << "the true coefficient is \n ";
 	std::cout << beta << std::endl;*/
 	Linear_Model model(X, y, 0.05);
-	model.estimator_print();
+	// model.estimator_print();
 	// model.estimator_error(beta);
 }
 
