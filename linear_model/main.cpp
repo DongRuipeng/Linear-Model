@@ -6,17 +6,22 @@
 
 int main()
 {
-	unsigned n = 100, p = 20;
+	unsigned n = 100, p = 15;
 	arma::mat X = arma::randn<arma::mat>(n, p);
 	arma::vec beta = arma::zeros(p);
-	arma::vec e = 0.1*arma::zeros(p);
-	arma::uvec index = { 0,1,2,3,4 };
+	arma::uvec index = { 0,1,2,3,4,5,6,7,8,9};
 	beta(index) = arma::randn<arma::vec>(index.n_rows);
-	arma::vec y = X * beta;
-	std::cout << "the true coefficient is \n ";
-	std::cout << beta << std::endl;
-	Linear_Model model(X, y, 0.001);
-	model.estimator_error(beta);
+
+	arma::vec e = 0.1*arma::zeros(n);
+	arma::vec y = X * beta;// +e;
+
+	
+	
+	/*std::cout << "the true coefficient is \n ";
+	std::cout << beta << std::endl;*/
+	Linear_Model model(X, y, 0.05);
+	model.estimator_print();
+	// model.estimator_error(beta);
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

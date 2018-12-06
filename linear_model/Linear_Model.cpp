@@ -50,9 +50,12 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 	arma::uvec active_set_c = arma::find(abs(hc) != max_c);
 	// initilize hbeta
 	arma::mat hbeta = arma::zeros(X.n_cols, r_x + 1);
+	// define the column number of hbeta;
+	unsigned col_num_hbeta;
 
 	for (unsigned i = 0; i < r_x; i++)
 	{
+		col_num_hbeta = i;
 		// get the sign of the correlation in the active set
 		arma::vec s = get_sign(hc(active_set));
 		// make the angle between X_a and y less than pi/2
@@ -73,20 +76,19 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 		arma::vec a = X.t() * u_a;
 		// get the gama(i) in the i^th step
 		arma::vec temp_gama_1 = (max_c - hc(active_set_c)) / (A_a - a(active_set_c));
-		temp_gama_1(arma::find(temp_gama_1 < 0)).fill(INFINITY);
+		temp_gama_1(arma::find(temp_gama_1 <= 0)).fill(INFINITY);
 		arma::vec temp_gama_2 = (max_c + hc(active_set_c)) / (A_a + a(active_set_c));
-		temp_gama_2(arma::find(temp_gama_2 < 0)).fill(INFINITY);
+		temp_gama_2(arma::find(temp_gama_2 <= 0)).fill(INFINITY);
 		arma::vec temp_gama = arma::zeros(active_set_c.n_rows);
 		for (unsigned j = 0; j < active_set_c.n_rows; j++)
 		{
 			temp_gama[j] = std::min(temp_gama_1[j], temp_gama_2[j]);
 		}
-		// std::cout << temp_gama << std::endl;
 		gama[i] = temp_gama.min();
 		arma::vec d = arma::diagmat(s) * A_a * G_a_inv * one_vec;
 		arma::vec temp_d = -hbeta.submat(active_set, arma::uvec{ i }) / d;
-		temp_d(arma::find(temp_d < 0)).fill(INFINITY);
-		if (i!=0 && gama[i] > temp_d.min())
+		temp_d(arma::find(temp_d <= 0)).fill(INFINITY);
+		if (gama[i] > temp_d.min())
 		{
 			gama[i] = temp_d.min();
 			// update hbeta
@@ -150,8 +152,12 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * A_a * arma::diagmat(s) * G_a_inv * one_vec;
 			break;
 		}
+		// std::cout << max_c << std::endl;
 	}
+	col_num_hbeta = col_num_hbeta + 1;
+	//std::cout << col_num_hbeta << std::endl;
 	hbeta.shed_col(0);
+	//std::cout << hbeta.n_cols << std::endl;
 	return hbeta;
 }
 
