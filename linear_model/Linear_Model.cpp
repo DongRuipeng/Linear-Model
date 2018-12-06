@@ -83,9 +83,34 @@ arma::mat Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
 		}
 		// std::cout << temp_gama << std::endl;
 		gama[i] = temp_gama.min();
-
+		arma::vec d = arma::diagmat(s) * A_a * G_a_inv * one_vec;
+		arma::vec temp_d = -hbeta.submat(active_set, arma::uvec{ i }) / d;
+		temp_d(arma::find(temp_d < 0)).fill(INFINITY);
+		if (i!=0 && gama[i] > temp_d.min())
+		{
+			gama[i] = temp_d.min();
+			// update hbeta
+			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * d;
+			// update max_c
+			max_c = max_c - gama[i] * A_a;
+			if (max_c <= lambda)
+			{
+				break;
+			}
+			// update hc and hmu
+			hmu = hmu + gama[i] * u_a;
+			hc = X.t() * (y - hmu);
+			// update the active set and the complement
+			arma::uvec index = arma::find(temp_d == temp_d.min());
+			active_set_c.insert_rows(0, active_set.elem(index));
+			for (unsigned k = 0; k < index.n_elem; k++)
+			{
+				active_set.shed_row(index[k]);
+			}
+			continue;
+		}
 		// update hbeta
-		hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] * A_a * arma::diagmat(s) * G_a_inv * one_vec;
+		hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama[i] *  d;
 
 		// update max_c
 		max_c = max_c - gama[i] * A_a;

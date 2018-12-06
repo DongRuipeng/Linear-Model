@@ -6,7 +6,7 @@
 
 int main()
 {
-	unsigned n = 100, p = 100;
+	unsigned n = 100, p = 20;
 	arma::mat X = arma::randn<arma::mat>(n, p);
 	arma::vec beta = arma::zeros(p);
 	arma::vec e = 0.1*arma::zeros(p);
