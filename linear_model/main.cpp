@@ -12,14 +12,7 @@ int main()
 
 	arma::vec e = 0.1*arma::zeros(n);
 	arma::vec y = X * beta;// +e;
-
-	std::cout << arma::max(arma::abs(X.t() * y)) << std::endl;
-	
-	/*std::cout << "the true coefficient is \n ";
-	std::cout << beta << std::endl;*/
 	Linear_Model model(X, y, 30);
-	// model.estimator_print();
-	// model.estimator_error(beta);
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

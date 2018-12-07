@@ -38,8 +38,6 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 	unsigned r_x = arma::rank(X);
 	// intilize hmu
 	arma::vec hmu = arma::zeros(y.n_elem);
-	// initilize the output: gamma
-	// arma::vec gama = arma::zeros(r_x);
 	// initilize the correlation between X and y
 	arma::vec hc = X.t() * y;
 	// initilize the maximum correlation
@@ -178,8 +176,8 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 		max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
 	}
 	
-	std::cout << max_c << std::endl;
-	std::cout << hbeta << std::endl;
+	/*std::cout << max_c << std::endl;
+	std::cout << hbeta << std::endl;*/
 
 	Linear_Model::Solution_Path path;
 	path.C_path = max_c;
