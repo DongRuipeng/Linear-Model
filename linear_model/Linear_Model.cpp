@@ -1,7 +1,50 @@
 #include "Linear_Model.h"
 
+Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda, std::string mode)
+{
+	if (lambda == NULL)
+	{
+		Linear_Model::hbeta = ols(X, y);
+		Linear_Model::algorithm = "ols";
+		return;
+	}
+	else if (mode.compare("lars"))
+	{
+		Linear_Model::path = lars_path(X, y, lambda);
+		Linear_Model::hbeta = extract(Linear_Model::path, lambda);
+	}
+	else
+	{
+		Linear_Model::hbeta = coordinate_descent(X, y, lambda);
+	}
+	Linear_Model::algorithm = mode;
+}
 
-Linear_Model::Linear_Model(arma::mat X, arma::vec y)
+Linear_Model::~Linear_Model()
+{
+	std::cout << "delete the objetion ... \n";
+}
+
+void Linear_Model::show()
+{
+	if (Linear_Model::algorithm == "ols")
+	{
+		std::cout << "the algorithm is ols. \n";
+		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+	}
+	else if (Linear_Model::algorithm == "lars")
+	{
+		std::cout << "the algorithm is least angle regression. \n";
+		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+	}
+	else
+	{
+		std::cout << "the algorithm is coordinate descent method. \n";
+		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+	}
+}
+
+arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
 {
 	arma::mat G = X.t() * X;
 	arma::vec eigval;
@@ -17,20 +60,10 @@ Linear_Model::Linear_Model(arma::mat X, arma::vec y)
 		{
 			eigval[i] = 0;
 		}
-		arma::mat G_inv = eigvec * arma::diagmat(eigval) *eigvec.t();
-		Linear_Model::hbeta = G_inv * X.t() * y;
 	}
-}
-
-Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda)
-{
-	Linear_Model::hbeta = coordinate_descent(X, y, lambda);
-	Linear_Model::path = lars_path(X, y, lambda);
-}
-
-Linear_Model::~Linear_Model()
-{
-	std::cout << "delete the objetion ... \n";
+	arma::mat G_inv = eigvec * arma::diagmat(eigval) * eigvec.t();
+	arma::vec hbeta = G_inv * X.t() * y;
+	return hbeta;
 }
 
 Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
@@ -277,30 +310,3 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 	arma::vec hbeta = path.hbeta_path.col(index - 1) + alpha * (path.hbeta_path.col(index) - path.hbeta_path.col(index - 1));
 	return hbeta;
 }
-
-//void Linear_Model::estimator_print()
-//{
-//	if (Linear_Model::hbeta_path.is_empty())
-//	{
-//		std::cout << "there is no penalty, the OLS estimator : \n";
-//		std::cout << Linear_Model::hbeta << std::endl;
-//	}
-//	else
-//	{
-//		std::cout << "there is a penalty, the sparse esitmator : \n";
-//		std::cout << Linear_Model::hbeta << std::endl;
-//		std::cout << "the path of least angle regression is : \n";
-//		std::cout << Linear_Model::hbeta_path;
-//	}
-//}
-//
-//void Linear_Model::estimator_error(arma::vec beta)
-//{
-//	if (!Linear_Model::hbeta_path.is_empty())
-//	{
-//		std::cout << "the estimate error of the coordinate descend algorithm : \n";
-//		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta - beta) << "\n";
-//		/*std::cout << "the estimate error of the least angle regression : \n";
-//		std::cout << "\t\t" << arma::norm(Linear_Model::hbeta_path)*/
-//	}
-//}
