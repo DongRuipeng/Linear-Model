@@ -249,6 +249,32 @@ double Linear_Model::soft_threshold(double z, double lambda)
 	return z;
 }
 
+arma::vec Linear_Model::extract(Solution_Path path, double lambda)
+{
+	if (lambda > path.C_path[0])
+	{
+		std::cout << "waring : there is no variable being selected ! \n";
+		std::cout << "return a null variable, please reset lambda ! \n";
+		return arma::vec();
+	}
+	unsigned index;
+	for (unsigned i = 0; i < path.C_path.n_elem; i++)
+	{
+		if (path.C_path[i] <= lambda)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index == 0)
+	{
+		return path.hbeta_path.col(0);
+	}
+	double alpha = (path.C_path[index - 1] - lambda) / (path.C_path[index - 1] - path.C_path[index]);
+	arma::vec hbeta = path.hbeta_path.col(index - 1) + alpha * (path.hbeta_path.col(index) - path.hbeta_path.col(index - 1));
+	return hbeta;
+}
+
 //void Linear_Model::estimator_print()
 //{
 //	if (Linear_Model::hbeta_path.is_empty())

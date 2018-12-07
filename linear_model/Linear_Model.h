@@ -24,5 +24,6 @@ private:
 	arma::vec coordinate_descent(arma::mat X, arma::vec y, double lambda);
 	arma::vec get_sign(arma::vec x);
 	double soft_threshold(double z, double lambda);
+	arma::vec extract(Solution_Path path, double lambda);
 };
 
