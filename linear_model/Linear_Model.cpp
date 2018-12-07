@@ -257,7 +257,7 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 		std::cout << "return a null variable, please reset lambda ! \n";
 		return arma::vec();
 	}
-	unsigned index;
+	unsigned index = NULL;
 	for (unsigned i = 0; i < path.C_path.n_elem; i++)
 	{
 		if (path.C_path[i] <= lambda)
@@ -269,6 +269,11 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 	if (index == 0)
 	{
 		return path.hbeta_path.col(0);
+	}
+	else if (index == NULL)
+	{
+		std::cout << "lambda is too little, return a OLS estimator ! \n";
+		return path.hbeta_path.col(path.C_path.n_elem - 1);
 	}
 	double alpha = (path.C_path[index - 1] - lambda) / (path.C_path[index - 1] - path.C_path[index]);
 	arma::vec hbeta = path.hbeta_path.col(index - 1) + alpha * (path.hbeta_path.col(index) - path.hbeta_path.col(index - 1));
