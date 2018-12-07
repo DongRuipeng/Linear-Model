@@ -12,8 +12,10 @@ int main()
 	arma::vec e = 0.1*arma::randn<arma::vec>(n);
 	arma::vec y = X * beta + e;
 	double lambda = 0.01;
-	Linear_Model model(X, y, lambda);
-	model.show();
+	Linear_Model model_co(X, y, lambda);
+	model_co.show();
+	Linear_Model model_lar(X, y, lambda, "lars");
+	model_lar.show();
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

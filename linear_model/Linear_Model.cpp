@@ -223,7 +223,7 @@ arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lamb
 	unsigned p = X.n_cols;
 	unsigned MAX_ITERATION = 200;
 	unsigned NUM_ITERATION;
-	double eps = 1e-3;
+	double eps = 1e-5;
 	// initilize hbeta
 	arma::vec hbeta = arma::zeros(p);
 	// initilize r
