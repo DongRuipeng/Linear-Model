@@ -8,9 +8,9 @@ Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda, std::string 
 		Linear_Model::algorithm = "ols";
 		return;
 	}
-	else if (mode.compare("lars"))
+	else if (mode == "lars")
 	{
-		Linear_Model::path = lars_path(X, y, lambda);
+		Linear_Model::path = lars_path(X, y);
 		Linear_Model::hbeta = extract(Linear_Model::path, lambda);
 	}
 	else
@@ -36,6 +36,10 @@ void Linear_Model::show()
 	{
 		std::cout << "the algorithm is least angle regression. \n";
 		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+		std::cout << "the beta path of lars is : \n";
+		std::cout << Linear_Model::path.hbeta_path << std::endl;
+		std::cout << "the correlation path is : \n";
+		std::cout << Linear_Model::path.C_path << std::endl;
 	}
 	else
 	{
@@ -66,9 +70,10 @@ arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
 	return hbeta;
 }
 
-Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, double lambda)
+Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 {
 	unsigned r_x = arma::rank(X);
+	double eps = 1e-5;
 	// intilize hmu
 	arma::vec hmu = arma::zeros(y.n_elem);
 	// initilize the correlation between X and y
@@ -128,7 +133,7 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 			hbeta.submat(active_set, arma::uvec{ i + 1 }) = hbeta.submat(active_set, arma::uvec{ i }) + gama * d;
 			// update max_c
 			max_c[i + 1] = max_c[i] - gama * A_a;
-			if (max_c[i + 1] <= lambda)
+			if (max_c[i + 1] <= eps)
 			{
 				break;
 			}
@@ -149,7 +154,7 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y, do
 
 		// update max_c
 		max_c[i + 1] = max_c[i] - gama * A_a;
-		if (max_c[i + 1] <= lambda)
+		if (max_c[i + 1] <= eps)
 		{
 			break;
 		}

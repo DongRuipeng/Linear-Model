@@ -21,7 +21,7 @@ private:
 	arma::vec hbeta;
 	std::string algorithm;
 	// function
-	Linear_Model::Solution_Path lars_path(arma::mat X, arma::vec y, double lambda);
+	Linear_Model::Solution_Path lars_path(arma::mat X, arma::vec y);
 	arma::vec coordinate_descent(arma::mat X, arma::vec y, double lambda);
 	arma::vec get_sign(arma::vec x);
 	double soft_threshold(double z, double lambda);
