@@ -315,3 +315,28 @@ arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
 	arma::vec hbeta = G_inv * X.t() * y;
 	return hbeta;
 }
+
+arma::vec Linear_Model::scaled_lasso(arma::mat X, arma::vec y, double lambda0)
+{
+	// define the eps, initial sigma and lambda0
+	double eps = 1e-5, lambda = lambda0;
+	double sigma = arma::norm(y - X * ols(X, y))/sqrt(X.n_rows), sigma_old = INFINITY;
+	unsigned MAX_ITERATION = 100, iter_num = 0;
+	// define hbeta
+	arma::vec hbeta;
+	// initilize the path of lasso
+	path = lars_path(X, y);
+	while (abs(sigma - sigma_old) > eps && iter_num < MAX_ITERATION)
+	{
+		lambda = sigma_old * lambda;
+		hbeta = extract(path, lambda);
+		sigma_old = sigma;
+		sigma = norm(y - X * hbeta)/sqrt(X.n_rows);
+		iter_num = iter_num + 1;
+	}
+	if (iter_num == MAX_ITERATION)
+	{
+		std::cout << "warning: over the maximum iteration number ! \n";
+	}
+	return hbeta;
+}

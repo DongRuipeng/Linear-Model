@@ -27,5 +27,6 @@ private:
 	Linear_Model::Solution_Path lars_path(arma::mat X, arma::vec y);
 	arma::vec coordinate_descent(arma::mat X, arma::vec y, double lambda);
 	arma::vec ols(arma::mat X, arma::vec y);
+	arma::vec scaled_lasso(arma::mat X, arma::vec y, double lambda);
 };
 
