@@ -48,6 +48,11 @@ void Linear_Model::show()
 	}
 }
 
+arma::vec Linear_Model::get_estimator()
+{
+	return Linear_Model::hbeta;
+}
+
 arma::vec Linear_Model::get_sign(arma::vec x)
 {
 	arma::vec s;
@@ -82,7 +87,7 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 		std::cout << "return a null variable, please reset lambda ! \n";
 		return arma::vec();
 	}
-	unsigned index = NULL;
+	unsigned index = path.C_path.n_elem;
 	for (unsigned i = 0; i < path.C_path.n_elem; i++)
 	{
 		if (path.C_path[i] <= lambda)
@@ -95,7 +100,7 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 	{
 		return path.hbeta_path.col(0);
 	}
-	else if (index == NULL)
+	else if (index == path.C_path.n_elem)
 	{
 		std::cout << "lambda is too little, return a OLS estimator ! \n";
 		return path.hbeta_path.col(path.C_path.n_elem - 1);
@@ -236,7 +241,7 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 	}
 	col_num_hbeta = col_num_hbeta + 1;
 	//std::cout << col_num_hbeta << std::endl;
-	if (active_set_c.is_empty())
+	/*if (active_set_c.is_empty())
 	{
 		hbeta.shed_col(0);
 		max_c.shed_row(0);
@@ -247,14 +252,15 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 		hbeta.shed_cols(col_num_hbeta, hbeta.n_cols - 1);
 		max_c.shed_row(0);
 		max_c.shed_rows(col_num_hbeta, max_c.n_rows - 1);
-	}
-	
+	}*/
+	arma::mat hbeta_path = hbeta.cols(1, col_num_hbeta);
+	arma::vec C_path = max_c.subvec(1, col_num_hbeta);
 	/*std::cout << max_c << std::endl;
-	std::cout << hbeta << std::endl;*/
+	std::cout << hbeta.col(1) << std::endl;*/
 
 	Linear_Model::Solution_Path path;
-	path.C_path = max_c;
-	path.hbeta_path = hbeta;
+	path.C_path = C_path;
+	path.hbeta_path = hbeta_path;
 	return path;
 }
 

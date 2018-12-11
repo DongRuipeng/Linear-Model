@@ -9,6 +9,7 @@ public:
 	Linear_Model(arma::mat X, arma::vec y, double lambda = NULL, std::string mode = "coordinate");
 	~Linear_Model();
 	void show();
+	arma::vec get_estimator();
 
 private:
 	// data
