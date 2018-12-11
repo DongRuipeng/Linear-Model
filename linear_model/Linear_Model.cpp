@@ -48,25 +48,60 @@ void Linear_Model::show()
 	}
 }
 
-arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
+arma::vec Linear_Model::get_sign(arma::vec x)
 {
-	arma::mat G = X.t() * X;
-	arma::vec eigval;
-	arma::mat eigvec;
-	arma::eig_sym(eigval, eigvec, G);
-	for (unsigned i = 0; i < eigval.n_elem; i++)
+	arma::vec s;
+	s.zeros(arma::size(x));
+	s(arma::find(x >= 0)).fill(1);
+	s(arma::find(x < 0)).fill(-1);
+	return s;
+}
+
+double Linear_Model::soft_threshold(double z, double lambda)
+{
+	if (z > lambda)
 	{
-		if (eigval[i] != 0)
+		z = z - lambda;
+	}
+	else if (z < -lambda)
+	{
+		z = z + lambda;
+	}
+	else
+	{
+		z = 0;
+	}
+	return z;
+}
+
+arma::vec Linear_Model::extract(Solution_Path path, double lambda)
+{
+	if (lambda > path.C_path[0])
+	{
+		std::cout << "waring : there is no variable being selected ! \n";
+		std::cout << "return a null variable, please reset lambda ! \n";
+		return arma::vec();
+	}
+	unsigned index = NULL;
+	for (unsigned i = 0; i < path.C_path.n_elem; i++)
+	{
+		if (path.C_path[i] <= lambda)
 		{
-			eigval[i] = 1 / eigval[i];
-		}
-		else
-		{
-			eigval[i] = 0;
+			index = i;
+			break;
 		}
 	}
-	arma::mat G_inv = eigvec * arma::diagmat(eigval) * eigvec.t();
-	arma::vec hbeta = G_inv * X.t() * y;
+	if (index == 0)
+	{
+		return path.hbeta_path.col(0);
+	}
+	else if (index == NULL)
+	{
+		std::cout << "lambda is too little, return a OLS estimator ! \n";
+		return path.hbeta_path.col(path.C_path.n_elem - 1);
+	}
+	double alpha = (path.C_path[index - 1] - lambda) / (path.C_path[index - 1] - path.C_path[index]);
+	arma::vec hbeta = path.hbeta_path.col(index - 1) + alpha * (path.hbeta_path.col(index) - path.hbeta_path.col(index - 1));
 	return hbeta;
 }
 
@@ -259,59 +294,24 @@ arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lamb
 	return hbeta;
 }
 
-arma::vec Linear_Model::get_sign(arma::vec x)
+arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
 {
-	arma::vec s;
-	s.zeros(arma::size(x));
-	s(arma::find(x >= 0)).fill(1);
-	s(arma::find(x < 0)).fill(-1);
-	return s;
-}
-
-double Linear_Model::soft_threshold(double z, double lambda)
-{
-	if (z > lambda)
+	arma::mat G = X.t() * X;
+	arma::vec eigval;
+	arma::mat eigvec;
+	arma::eig_sym(eigval, eigvec, G);
+	for (unsigned i = 0; i < eigval.n_elem; i++)
 	{
-		z = z - lambda;
-	}
-	else if (z < -lambda)
-	{
-		z = z + lambda;
-	}
-	else
-	{
-		z = 0;
-	}
-	return z;
-}
-
-arma::vec Linear_Model::extract(Solution_Path path, double lambda)
-{
-	if (lambda > path.C_path[0])
-	{
-		std::cout << "waring : there is no variable being selected ! \n";
-		std::cout << "return a null variable, please reset lambda ! \n";
-		return arma::vec();
-	}
-	unsigned index = NULL;
-	for (unsigned i = 0; i < path.C_path.n_elem; i++)
-	{
-		if (path.C_path[i] <= lambda)
+		if (eigval[i] != 0)
 		{
-			index = i;
-			break;
+			eigval[i] = 1 / eigval[i];
+		}
+		else
+		{
+			eigval[i] = 0;
 		}
 	}
-	if (index == 0)
-	{
-		return path.hbeta_path.col(0);
-	}
-	else if (index == NULL)
-	{
-		std::cout << "lambda is too little, return a OLS estimator ! \n";
-		return path.hbeta_path.col(path.C_path.n_elem - 1);
-	}
-	double alpha = (path.C_path[index - 1] - lambda) / (path.C_path[index - 1] - path.C_path[index]);
-	arma::vec hbeta = path.hbeta_path.col(index - 1) + alpha * (path.hbeta_path.col(index) - path.hbeta_path.col(index - 1));
+	arma::mat G_inv = eigvec * arma::diagmat(eigval) * eigvec.t();
+	arma::vec hbeta = G_inv * X.t() * y;
 	return hbeta;
 }
