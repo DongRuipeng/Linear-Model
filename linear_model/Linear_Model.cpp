@@ -208,7 +208,7 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 		// update hc and hmu
 		hmu = hmu + gama * u_a;
 		hc = X.t() * (y - hmu);
-		if (active_set_c.n_rows == 0)
+		if (active_set_c.n_rows == 0 || i == r_x - 2)
 		{
 			// std::cout << "complement is null ... \n";
 			i = i + 1;
