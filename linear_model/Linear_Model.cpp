@@ -181,12 +181,15 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 			hmu = hmu + gama * u_a;
 			hc = X.t() * (y - hmu);
 			// update the active set and the complement
-			arma::uvec index = arma::find(temp_d == temp_d.min());
+			arma::uvec index = arma::find(temp_d == temp_d.min()), index_c = arma::find(temp_d != temp_d.min());
 			active_set_c.insert_rows(0, active_set.elem(index));
-			for (unsigned k = 0; k < index.n_elem; k++)
+			arma::uvec temp = active_set.elem(index_c);
+			active_set.reset();
+			active_set = temp;
+			/*for (unsigned k = 0; k < index.n_elem; k++)
 			{
 				active_set.shed_row(index[k]);
-			}
+			}*/
 			continue;
 		}
 		// update hbeta
@@ -199,12 +202,15 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 			break;
 		}
 		// update the active set and the complement
-		arma::uvec new_x_set = arma::find(temp_gama == gama);
+		arma::uvec new_x_set = arma::find(temp_gama == gama), new_x_set_c = arma::find(temp_gama != gama);
 		active_set.insert_rows(0, active_set_c.elem(new_x_set));
-		for (unsigned k = 0; k < new_x_set.n_elem; k++)
+		arma::uvec temp = active_set_c.elem(new_x_set_c);
+		active_set_c.reset();
+		active_set_c = temp;
+		/*for (unsigned k = 0; k < new_x_set.n_elem; k++)
 		{
 			active_set_c.shed_row(new_x_set[k]);
-		}
+		}*/
 		// update hc and hmu
 		hmu = hmu + gama * u_a;
 		hc = X.t() * (y - hmu);

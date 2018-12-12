@@ -21,4 +21,11 @@ int main()
 	std::cout << "\t " << arma::norm(beta - model_ols.get_estimator());
 	std::cout << "\t " << arma::norm(beta - model_co.get_estimator());
 	std::cout << "\t " << arma::norm(beta - model_lar.get_estimator()) << "\n";
+
+	/*arma::vec a = arma::randn<arma::vec>(6);
+	std::cout << a << std::endl;
+	a.reset();
+	std::cout << a << std::endl;
+	a = arma::zeros(3);
+	std::cout << a << std::endl;*/
 }
