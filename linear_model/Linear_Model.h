@@ -30,4 +30,3 @@ private:
 	arma::vec ols(arma::mat X, arma::vec y);
 	arma::vec scaled_lasso(arma::mat X, arma::vec y, double lambda);
 };
-

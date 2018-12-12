@@ -13,6 +13,10 @@ Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda, std::string 
 		Linear_Model::path = lars_path(X, y);
 		Linear_Model::hbeta = extract(Linear_Model::path, lambda);
 	}
+	else if (mode == "scaled")
+	{
+		Linear_Model::hbeta = scaled_lasso(X, y, lambda);
+	}
 	else
 	{
 		Linear_Model::hbeta = coordinate_descent(X, y, lambda);
@@ -332,7 +336,7 @@ arma::vec Linear_Model::scaled_lasso(arma::mat X, arma::vec y, double lambda0)
 {
 	// define the eps, initial sigma and lambda0
 	double eps = 1e-5, lambda = lambda0;
-	double sigma = arma::norm(y - X * ols(X, y))/sqrt(X.n_rows), sigma_old = INFINITY;
+	double sigma = 0, sigma_old = arma::norm(y - X * ols(X, y)) / sqrt(X.n_rows);
 	unsigned MAX_ITERATION = 100, iter_num = 0;
 	// define hbeta
 	arma::vec hbeta;
