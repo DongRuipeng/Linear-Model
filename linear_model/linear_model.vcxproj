@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="Linear_Model.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SVM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Linear_Model.h" />
