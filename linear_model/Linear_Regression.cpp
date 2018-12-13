@@ -1,63 +1,63 @@
 #include "Linear_Model.h"
 
-Linear_Model::Linear_Model(arma::mat X, arma::vec y, double lambda, std::string mode)
+Linear_Regression::Linear_Regression(arma::mat X, arma::vec y, double lambda, std::string mode)
 {
 	if (lambda == NULL)
 	{
-		Linear_Model::hbeta = ols(X, y);
-		Linear_Model::algorithm = "ols";
+		Linear_Regression::hbeta = ols(X, y);
+		Linear_Regression::algorithm = "ols";
 		return;
 	}
 	else if (mode == "lars")
 	{
-		Linear_Model::path = lars_path(X, y);
-		Linear_Model::hbeta = extract(Linear_Model::path, lambda);
+		Linear_Regression::path = lars_path(X, y);
+		Linear_Regression::hbeta = extract(Linear_Regression::path, lambda);
 	}
 	else if (mode == "scaled")
 	{
-		Linear_Model::hbeta = scaled_lasso(X, y, lambda);
+		Linear_Regression::hbeta = scaled_lasso(X, y, lambda);
 	}
 	else
 	{
-		Linear_Model::hbeta = coordinate_descent(X, y, lambda);
+		Linear_Regression::hbeta = coordinate_descent(X, y, lambda);
 	}
-	Linear_Model::algorithm = mode;
+	Linear_Regression::algorithm = mode;
 }
 
-Linear_Model::~Linear_Model()
+Linear_Regression::~Linear_Regression()
 {
 	std::cout << "delete the objetion ... \n";
 }
 
-void Linear_Model::show()
+void Linear_Regression::show()
 {
-	if (Linear_Model::algorithm == "ols")
+	if (Linear_Regression::algorithm == "ols")
 	{
 		std::cout << "the algorithm is ols. \n";
-		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+		std::cout << "hbeta : \n" << Linear_Regression::hbeta << std::endl;
 	}
-	else if (Linear_Model::algorithm == "lars")
+	else if (Linear_Regression::algorithm == "lars")
 	{
 		std::cout << "the algorithm is least angle regression. \n";
-		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+		std::cout << "hbeta : \n" << Linear_Regression::hbeta << std::endl;
 		std::cout << "the beta path of lars is : \n";
-		std::cout << Linear_Model::path.hbeta_path << std::endl;
+		std::cout << Linear_Regression::path.hbeta_path << std::endl;
 		std::cout << "the correlation path is : \n";
-		std::cout << Linear_Model::path.C_path << std::endl;
+		std::cout << Linear_Regression::path.C_path << std::endl;
 	}
 	else
 	{
 		std::cout << "the algorithm is coordinate descent method. \n";
-		std::cout << "hbeta : \n" << Linear_Model::hbeta << std::endl;
+		std::cout << "hbeta : \n" << Linear_Regression::hbeta << std::endl;
 	}
 }
 
-arma::vec Linear_Model::get_estimator()
+arma::vec Linear_Regression::get_estimator()
 {
-	return Linear_Model::hbeta;
+	return Linear_Regression::hbeta;
 }
 
-arma::vec Linear_Model::get_sign(arma::vec x)
+arma::vec Linear_Regression::get_sign(arma::vec x)
 {
 	arma::vec s;
 	s.zeros(arma::size(x));
@@ -66,7 +66,7 @@ arma::vec Linear_Model::get_sign(arma::vec x)
 	return s;
 }
 
-double Linear_Model::soft_threshold(double z, double lambda)
+double Linear_Regression::soft_threshold(double z, double lambda)
 {
 	if (z > lambda)
 	{
@@ -83,7 +83,7 @@ double Linear_Model::soft_threshold(double z, double lambda)
 	return z;
 }
 
-arma::vec Linear_Model::extract(Solution_Path path, double lambda)
+arma::vec Linear_Regression::extract(Solution_Path path, double lambda)
 {
 	if (lambda > path.C_path[0])
 	{
@@ -114,7 +114,7 @@ arma::vec Linear_Model::extract(Solution_Path path, double lambda)
 	return hbeta;
 }
 
-Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
+Linear_Regression::Solution_Path Linear_Regression::lars_path(arma::mat X, arma::vec y)
 {
 	unsigned r_x = arma::rank(X);
 	double eps = 1e-5;
@@ -268,13 +268,13 @@ Linear_Model::Solution_Path Linear_Model::lars_path(arma::mat X, arma::vec y)
 	/*std::cout << max_c << std::endl;
 	std::cout << hbeta.col(1) << std::endl;*/
 
-	Linear_Model::Solution_Path path;
+	Linear_Regression::Solution_Path path;
 	path.C_path = C_path;
 	path.hbeta_path = hbeta_path;
 	return path;
 }
 
-arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lambda)
+arma::vec Linear_Regression::coordinate_descent(arma::mat X, arma::vec y, double lambda)
 {
 	unsigned p = X.n_cols;
 	unsigned MAX_ITERATION = 200;
@@ -310,7 +310,7 @@ arma::vec Linear_Model::coordinate_descent(arma::mat X, arma::vec y, double lamb
 	return hbeta;
 }
 
-arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
+arma::vec Linear_Regression::ols(arma::mat X, arma::vec y)
 {
 	arma::mat G = X.t() * X;
 	arma::vec eigval;
@@ -332,7 +332,7 @@ arma::vec Linear_Model::ols(arma::mat X, arma::vec y)
 	return hbeta;
 }
 
-arma::vec Linear_Model::scaled_lasso(arma::mat X, arma::vec y, double lambda0)
+arma::vec Linear_Regression::scaled_lasso(arma::mat X, arma::vec y, double lambda0)
 {
 	// define the eps, initial sigma and lambda0
 	double eps = 1e-5, lambda = lambda0;

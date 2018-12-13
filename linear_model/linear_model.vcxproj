@@ -156,7 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Linear_Model.cpp" />
+    <ClCompile Include="Linear_Regression.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SVM.cpp" />
   </ItemGroup>

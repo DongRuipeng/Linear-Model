@@ -13,10 +13,10 @@ int main()
 	// initilize lambda
 	double lambda = 0.01;
 	// estimate 
-	Linear_Model model_ols(X, y);
-	Linear_Model model_co(X, y, lambda);
-	Linear_Model model_lar(X, y, lambda, "lars");
-	Linear_Model model_scal(X, y, lambda, "scaled");
+	Linear_Regression model_ols(X, y);
+	Linear_Regression model_co(X, y, lambda);
+	Linear_Regression model_lar(X, y, lambda, "lars");
+	Linear_Regression model_scal(X, y, lambda, "scaled");
 	// print result
 	std::cout << "ols \t" << arma::norm(beta - model_ols.get_estimator()) << "\n";
 	std::cout << "coordinate \t" << arma::norm(beta - model_co.get_estimator()) << "\n";
