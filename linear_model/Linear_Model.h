@@ -36,10 +36,11 @@ class SVM
 public:
 	SVM(arma::mat X, arma::vec y, double C);
 	~SVM();
+	void show();
 
 private:
 	// data
-	arma::vec alpha;
+	arma::vec alpha, w;
 	arma::mat support_vector;
 	arma::vec support_label;
 	double b;

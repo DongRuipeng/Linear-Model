@@ -24,4 +24,19 @@ int main()
 	//std::cout << "least angle \t" << arma::norm(beta - model_lar.get_estimator()) << "\n";
 	//std::cout << "scaled \t" << arma::norm(beta - model_scal.get_estimator()) << "\n";
 	/*=====support vector machine example=====*/
+	// generate data
+	unsigned n = 50;
+	arma::mat X = arma::randn<arma::mat>(2 * n, 2);
+	X.tail_rows(n) = -X.head_rows(n);
+	arma::vec y = arma::ones<arma::vec>(2 * n);
+	y.subvec(n, 2 * n - 1) = -y.subvec(n, 2 * n - 1);
+	arma::Row<double> position = { 30,30 };
+	X.head_rows(n).each_row() + position;
+	X.tail_rows(n).each_row() - position;
+	// constructe svm
+	SVM model(X, y, 1.0);
+	model.show();
+	std::cout << X.tail_rows(n).each_row() - position << std::endl;
+
+	return 0;
 }
