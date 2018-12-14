@@ -39,5 +39,7 @@ public:
 
 private:
 	arma::vec w;
+	arma::mat support_vector;
+	arma::vec support_label;
 	double b;
 };
