@@ -34,12 +34,17 @@ private:
 class SVM
 {
 public:
-	SVM();
+	SVM(arma::mat X, arma::vec y, double C);
 	~SVM();
 
 private:
-	arma::vec w;
+	// data
+	arma::vec alpha;
 	arma::mat support_vector;
 	arma::vec support_label;
 	double b;
+	// function
+	arma::vec solver(arma::mat Q, arma::vec y, double C);
+	arma::mat get_matrix_Q(arma::mat X, arma::vec y);
+	double kernel(arma::Row<double> a, arma::Row<double> b, std::string mode = "linear");
 };
