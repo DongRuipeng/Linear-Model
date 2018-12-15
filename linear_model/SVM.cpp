@@ -5,8 +5,10 @@ SVM::SVM(arma::mat X, arma::vec y, double C)
 {
 	arma::mat Q = get_matrix_Q(X, y);
 	SVM::alpha = solver(Q, y, C);
-	SVM::w = X.t() * SVM::alpha;
+	SVM::w = X.t() * (SVM::alpha % y);
 	SVM::w = SVM::w / arma::norm(SVM::w);
+	/*std::cout << "alpha is \n";
+	std::cout << SVM::alpha(arma::find(SVM::alpha != 0));*/
 }
 
 SVM::~SVM()

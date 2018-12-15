@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <fstream>
 #include "Linear_Model.h"
 
 int main()
@@ -26,17 +27,23 @@ int main()
 	/*=====support vector machine example=====*/
 	// generate data
 	unsigned n = 50;
-	arma::mat X = arma::randn<arma::mat>(2 * n, 2);
-	X.tail_rows(n) = -X.head_rows(n);
+	arma::vec mean = {10,10};
+	arma::mat cov = arma::eye(2,2);
+	arma::mat X = arma::zeros<arma::mat>(2 * n, 2);
+	X.head_rows(n) = arma::mvnrnd(mean, cov, n).t();
+	X.tail_rows(n) = arma::mvnrnd(-mean, cov, n).t();
 	arma::vec y = arma::ones<arma::vec>(2 * n);
 	y.subvec(n, 2 * n - 1) = -y.subvec(n, 2 * n - 1);
-	arma::Row<double> position = { 30,30 };
-	X.head_rows(n).each_row() + position;
-	X.tail_rows(n).each_row() - position;
+	//std::ofstream Xout(".\\X.txt");
+	//std::ofstream yout(".\\y.txt");
+	//Xout << X;
+	//yout << y;
+	//Xout.close();
+	//yout.close();
+	//std::cout << X << std::endl;
 	// constructe svm
-	SVM model(X, y, 1.0);
+	SVM model(X, y, 0.001);
 	model.show();
-	std::cout << X.tail_rows(n).each_row() - position << std::endl;
 
 	return 0;
 }
