@@ -1,7 +1,5 @@
-# linear regression
-The program includes least angle algorithm and coordinate descent algorithm for linear regression.
-For extension, I code these algorithms by c++.
-The c++ code depends on the armadillo matrix library which can be achieved in http://arma.sourceforge.net/download.html.
+# Introduction
+This projection depends on the armadillo matrix library which can be achieved in http://arma.sourceforge.net/download.html. The program mainly includes linear regression and classification. More detaily, there are ordinary least squares regression, least angle regression and coordinate descent algorithm for linear regression. About the linear classification, now, it only has support vector machine which is based on the SMO algorithm. 
 
 # Reference
 [1] Breheny, Patrick, and Jian Huang. "Coordinate descent algorithms for nonconvex penalized regression, with applications to biological       feature selection." The annals of applied statistics 5.1 (2011): 232.
