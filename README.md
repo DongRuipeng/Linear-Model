@@ -9,3 +9,5 @@ This projection depends on the armadillo matrix library which can be achieved in
 [3] Fan, Rong-En, Pai-Hsuen Chen, and Chih-Jen Lin. "Working set selection using second order information for training support vector         machines." Journal of machine learning research 6.Dec (2005): 1889-1918.
 
 [4] Platt, John. "Sequential minimal optimization: A fast algorithm for training support vector machines." (1998).
+
+[5] Sanderson, Conrad, and Ryan Curtin. "Armadillo: a template-based C++ library for linear algebra." Journal of Open Source Software         (2016).
