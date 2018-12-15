@@ -34,7 +34,7 @@ private:
 class SVM
 {
 public:
-	SVM(arma::mat X, arma::vec y, double C);
+	SVM(arma::mat X, arma::vec y, double C = INFINITY);
 	~SVM();
 	void show();
 

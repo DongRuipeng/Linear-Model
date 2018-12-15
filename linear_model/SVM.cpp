@@ -18,7 +18,8 @@ SVM::~SVM()
 
 void SVM::show()
 {
-	std::cout << SVM::w << std::endl;
+	std::cout << "w : \n" << SVM::w << std::endl;
+	std::cout << "alpha :\n" << SVM::alpha << std::endl;
 }
 
 arma::vec SVM::solver(arma::mat Q, arma::vec y, double C)

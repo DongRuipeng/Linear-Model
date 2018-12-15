@@ -27,7 +27,7 @@ int main()
 	/*=====support vector machine example=====*/
 	// generate data
 	unsigned n = 50;
-	arma::vec mean = {10,10};
+	arma::vec mean = {30,30};
 	arma::mat cov = arma::eye(2,2);
 	arma::mat X = arma::zeros<arma::mat>(2 * n, 2);
 	X.head_rows(n) = arma::mvnrnd(mean, cov, n).t();
@@ -42,7 +42,7 @@ int main()
 	//yout.close();
 	//std::cout << X << std::endl;
 	// constructe svm
-	SVM model(X, y, 0.001);
+	SVM model(X, y);
 	model.show();
 
 	return 0;
