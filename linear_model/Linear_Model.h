@@ -34,7 +34,7 @@ private:
 class SVM
 {
 public:
-	SVM(arma::mat X, arma::vec y, double C = INFINITY);
+	SVM(arma::mat X, arma::vec y, std::string mode = "linear", double C = INFINITY);
 	~SVM();
 	void show();
 
@@ -43,6 +43,7 @@ private:
 	arma::vec alpha, w;
 	arma::mat support_vector;
 	arma::vec support_label;
+	std::string kernel_type;
 	double b;
 	// function
 	arma::vec solver(arma::mat Q, arma::vec y, double C);

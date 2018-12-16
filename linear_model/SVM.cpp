@@ -1,8 +1,9 @@
 #include "Linear_Model.h"
 
 
-SVM::SVM(arma::mat X, arma::vec y, double C)
+SVM::SVM(arma::mat X, arma::vec y, std::string mode, double C)
 {
+	SVM::kernel_type = mode;
 	arma::mat Q = get_matrix_Q(X, y);
 	SVM::alpha = solver(Q, y, C);
 	SVM::w = X.t() * (SVM::alpha % y);
@@ -18,7 +19,7 @@ SVM::~SVM()
 
 void SVM::show()
 {
-	std::cout << "w : \n" << SVM::w << std::endl;
+	//std::cout << "w : \n" << SVM::w << std::endl;
 	std::cout << "alpha :\n" << SVM::alpha << std::endl;
 }
 
@@ -136,7 +137,7 @@ arma::mat SVM::get_matrix_Q(arma::mat X, arma::vec y)
 	{
 		for (unsigned j = 0; j < n; j++)
 		{
-			Q[i, j] = kernel(X.row(i), X.row(j))*y[i]*y[j];
+			Q[i, j] = kernel(X.row(i), X.row(j), SVM::kernel_type)*y[i]*y[j];
 		}
 	}
 	return Q;
@@ -144,5 +145,17 @@ arma::mat SVM::get_matrix_Q(arma::mat X, arma::vec y)
 
 double SVM::kernel(arma::Row<double> a, arma::Row<double> b, std::string mode)
 {
-	return arma::dot(a, b);
+	
+	if (mode == "linear")
+	{
+		return arma::dot(a, b);
+	}
+	else if (mode == "gaussian" || mode == "rbf")
+	{
+		return std::exp(-arma::dot(a - b, a - b));
+	}
+	else
+	{
+		throw "Please set the kernel type ! \n";
+	}
 }
