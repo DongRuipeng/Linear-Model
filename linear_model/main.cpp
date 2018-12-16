@@ -24,26 +24,25 @@ int main()
 	//std::cout << "coordinate \t" << arma::norm(beta - model_co.get_estimator()) << "\n";
 	//std::cout << "least angle \t" << arma::norm(beta - model_lar.get_estimator()) << "\n";
 	//std::cout << "scaled \t" << arma::norm(beta - model_scal.get_estimator()) << "\n";
-	/*=====support vector machine example=====*/
-	// generate data
-	unsigned n = 50;
-	arma::vec mean = {30,30};
-	arma::mat cov = arma::eye(2,2);
-	arma::mat X = arma::zeros<arma::mat>(2 * n, 2);
-	X.head_rows(n) = arma::mvnrnd(mean, cov, n).t();
-	X.tail_rows(n) = arma::mvnrnd(-mean, cov, n).t();
-	arma::vec y = arma::ones<arma::vec>(2 * n);
-	y.subvec(n, 2 * n - 1) = -y.subvec(n, 2 * n - 1);
-	//std::ofstream Xout(".\\X.txt");
-	//std::ofstream yout(".\\y.txt");
-	//Xout << X;
-	//yout << y;
-	//Xout.close();
-	//yout.close();
-	//std::cout << X << std::endl;
-	// constructe svm
-	SVM model(X, y);
-	model.show();
+	///*=====support vector machine example=====*/
+	//// generate data
+	//unsigned n = 50;
+	//arma::vec mean = {30,30};
+	//arma::mat cov = arma::eye(2,2);
+	//arma::mat X = arma::zeros<arma::mat>(2 * n, 2);
+	//X.head_rows(n) = arma::mvnrnd(mean, cov, n).t();
+	//X.tail_rows(n) = arma::mvnrnd(-mean, cov, n).t();
+	//arma::vec y = arma::ones<arma::vec>(2 * n);
+	//y.subvec(n, 2 * n - 1) = -y.subvec(n, 2 * n - 1);
+	//// constructe svm
+	//SVM model(X, y);
+	//model.show();
+
+	std::string str1, str2, str3;
+	str1 = "hello";
+	str2 = "hell";
+	str3 = str1 + str2;
+	std::cout << str3 << std::endl;
 
 	return 0;
 }
