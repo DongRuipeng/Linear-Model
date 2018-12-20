@@ -83,6 +83,36 @@ double Linear_Regression::soft_threshold(double z, double lambda)
 	return z;
 }
 
+double Linear_Regression::mcp_threshold(double z, double lambda, double gama)
+{
+	if (abs(z) > lambda * gama)
+	{
+		return z;
+	}
+	else
+	{
+		return soft_threshold(z, lambda) / (1 - 1 / gama);
+	}
+	// return 0.0;
+}
+
+double Linear_Regression::scad_threshold(double z, double lambda, double gama)
+{
+	if (abs(z) < 2*lambda || abs(z) == 2*lambda)
+	{
+		return soft_threshold(z, lambda);
+	}
+	else if (abs(z) > 2*lambda && (abs(z) < gama*lambda || abs(z) == gama*lambda))
+	{
+		return soft_threshold(z, gama*lambda / (gama - 1)) / (1 - 1 / (gama - 1));
+	}
+	else
+	{
+		return z;
+	}
+	// return 0.0;
+}
+
 arma::vec Linear_Regression::extract(Solution_Path path, double lambda)
 {
 	if (lambda > path.C_path[0])

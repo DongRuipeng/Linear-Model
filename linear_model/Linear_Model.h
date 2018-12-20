@@ -24,6 +24,8 @@ private:
 	// function
 	arma::vec get_sign(arma::vec x);
 	double soft_threshold(double z, double lambda);
+	double mcp_threshold(double z, double lambda, double gama);
+	double scad_threshold(double z, double lambda, double gama);
 	arma::vec extract(Solution_Path path, double lambda);
 	Linear_Regression::Solution_Path lars_path(arma::mat X, arma::vec y);
 	arma::vec coordinate_descent(arma::mat X, arma::vec y, double lambda);
